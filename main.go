@@ -40,6 +40,8 @@ import (
 var (
 	//host       = flag.String("host", "", "Comma-separated hostnames and IPs to generate a certificate for")
 	host       = flag.String("host", "", "Comma-separated hostnames to generate a certificate for (only use one unless -parent-chain or -grandparent-chain is set)")
+	email      = flag.Bool("email", false, "Generate a certificate for an email address instead of a DNS name")
+	uri        = flag.Bool("uri", false, "Generate a certificate for a URI instead of a DNS name")
 	validFrom  = flag.String("start-date", "", "Creation date formatted as Jan 1 15:04:05 2011")
 	validFor   = flag.Duration("duration", 365*24*time.Hour, "Duration that certificate is valid for")
 	//isCA       = flag.Bool("ca", false, "whether this cert should be its own Certificate Authority")

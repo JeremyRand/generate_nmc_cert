@@ -191,10 +191,26 @@ func getParent() (x509.Certificate, any) {
 	//		template.IPAddresses = append(template.IPAddresses, ip)
 	//	} else {
 	//		template.DNSNames = append(template.DNSNames, h)
-	template.PermittedDNSDomains = append(template.PermittedDNSDomains, h)
+	if *email {
 	template.PermittedEmailAddresses = append(template.PermittedEmailAddresses, h)
+	} else if *uri {
 	template.PermittedURIDomains = append(template.PermittedURIDomains, h)
+	} else {
+	template.PermittedDNSDomains = append(template.PermittedDNSDomains, h)
+	}
 	//	}
+	}
+
+	if len(template.PermittedDNSDomains) == 0 {
+		template.ExcludedDNSDomains = append(template.ExcludedDNSDomains, ".")
+	}
+
+	if len(template.PermittedEmailAddresses) == 0 {
+		template.ExcludedEmailAddresses = append(template.ExcludedEmailAddresses, ".")
+	}
+
+	if len(template.PermittedURIDomains) == 0 {
+		template.ExcludedURIDomains = append(template.ExcludedURIDomains, ".")
 	}
 
 	//if *isCA {
