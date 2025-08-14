@@ -33,7 +33,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
-	//"net"
+	"net"
 	"net/url"
 	"os"
 	"strings"
@@ -156,6 +156,16 @@ func getParent() (x509.Certificate, any) {
 		log.Fatalf("Failed to generate serial number: %v", err)
 	}
 
+	_, ipv4NetAll, err := net.ParseCIDR("0.0.0.0/0")
+	if err != nil {
+		log.Fatalf("Failed to parse IPv4 constraint: %v", err)
+	}
+
+	_, ipv6NetAll, err := net.ParseCIDR("::/0")
+	if err != nil {
+		log.Fatalf("Failed to parse IPv6 constraint: %v", err)
+	}
+
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
@@ -172,6 +182,7 @@ func getParent() (x509.Certificate, any) {
 		BasicConstraintsValid: true,
 
 		PermittedDNSDomainsCritical: true,
+		ExcludedIPRanges:            []*net.IPNet{ipv4NetAll, ipv6NetAll},
 	}
 
 	hosts := strings.Split(*host, ",")
@@ -181,6 +192,8 @@ func getParent() (x509.Certificate, any) {
 	//	} else {
 	//		template.DNSNames = append(template.DNSNames, h)
 	template.PermittedDNSDomains = append(template.PermittedDNSDomains, h)
+	template.PermittedEmailAddresses = append(template.PermittedEmailAddresses, h)
+	template.PermittedURIDomains = append(template.PermittedURIDomains, h)
 	//	}
 	}
 
