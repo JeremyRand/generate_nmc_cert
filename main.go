@@ -43,6 +43,9 @@ var (
 	host       = flag.String("host", "", "Comma-separated hostnames to generate a certificate for (only use one unless -parent-chain or -grandparent-chain is set)")
 	email      = flag.Bool("email", false, "Generate a certificate for an email address instead of a DNS name")
 	uri        = flag.Bool("uri", false, "Generate a certificate for a URI instead of a DNS name")
+	client     = flag.Bool("client", false, "Generate a certificate for a TLS client instead of a TLS server (EKU)")
+	code       = flag.Bool("code", false, "Generate a certificate for code signing instead of a TLS server (EKU)")
+	smime      = flag.Bool("smime", false, "Generate a certificate for S/MIME instead of a TLS server (EKU)")
 	validFrom  = flag.String("start-date", "", "Creation date formatted as Jan 1 15:04:05 2011")
 	validFor   = flag.Duration("duration", 365*24*time.Hour, "Duration that certificate is valid for")
 	//isCA       = flag.Bool("ca", false, "whether this cert should be its own Certificate Authority")
@@ -153,7 +156,7 @@ func main() {
 		NotAfter:  notAfterFloored,
 
 		KeyUsage:              keyUsage,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		//ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
@@ -177,6 +180,16 @@ func main() {
 	}
 
 	template.Subject.CommonName = hosts[0]
+
+	if *client {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageClientAuth)
+	} else if *code {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageCodeSigning)
+	} else if *smime {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageEmailProtection)
+	} else {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageServerAuth)
+	}
 
 	//if *isCA {
 	//	template.IsCA = true

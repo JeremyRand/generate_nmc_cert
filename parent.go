@@ -178,7 +178,7 @@ func getParent() (x509.Certificate, any) {
 
 		IsCA:                  true,
 		KeyUsage:              keyUsage,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		//ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 
 		PermittedDNSDomainsCritical: true,
@@ -211,6 +211,16 @@ func getParent() (x509.Certificate, any) {
 
 	if len(template.PermittedURIDomains) == 0 {
 		template.ExcludedURIDomains = append(template.ExcludedURIDomains, ".")
+	}
+
+	if *client {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageClientAuth)
+	} else if *code {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageCodeSigning)
+	} else if *smime {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageEmailProtection)
+	} else {
+		template.ExtKeyUsage = append(template.ExtKeyUsage, x509.ExtKeyUsageServerAuth)
 	}
 
 	//if *isCA {
