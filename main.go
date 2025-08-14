@@ -32,6 +32,7 @@ import (
 	"log"
 	"math/big"
 	//"net"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -161,11 +162,21 @@ func main() {
 	//	if ip := net.ParseIP(h); ip != nil {
 	//		template.IPAddresses = append(template.IPAddresses, ip)
 	//	} else {
+		if *email {
+			template.EmailAddresses = append(template.EmailAddresses, h)
+		} else if *uri {
+			u, err := url.Parse(h)
+			if err != nil {
+				log.Fatalf("Failed to parse URL: %v", err)
+			}
+			template.URIs = append(template.URIs, u)
+		} else {
 			template.DNSNames = append(template.DNSNames, h)
+		}
 	//	}
 	}
 
-	template.Subject.CommonName = template.DNSNames[0]
+	template.Subject.CommonName = hosts[0]
 
 	//if *isCA {
 	//	template.IsCA = true
